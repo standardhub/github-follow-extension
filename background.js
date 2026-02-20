@@ -3,7 +3,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   console.log('GitHub Follow Bot installed');
   
-  // Initialize storage
+  // Initialize storage with default settings
   chrome.storage.local.set({
     isRunning: false,
     followCount: 0,
@@ -13,7 +13,13 @@ chrome.runtime.onInstalled.addListener(() => {
     maxProcessed: 10000,
     maxFollowed: 500,
     delayMin: 8,
-    delayMax: 16
+    delayMax: 16,
+    regionNorthAmerica: true,
+    regionSouthAmerica: false,
+    regionEurope: true,
+    regionAsia: false,
+    regionAfrica: false,
+    regionOceania: false
   });
 });
 

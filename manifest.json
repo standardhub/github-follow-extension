@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "GitHub Follow Bot",
   "version": "1.0",
-  "description": "Auto-follow GitHub users from US, Canada, and Europe",
+  "description": "Auto-follow GitHub users with customizable region filtering",
   "permissions": ["storage", "activeTab"],
   "host_permissions": ["https://github.com/*"],
   "action": {

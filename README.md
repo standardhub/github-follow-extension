@@ -1,13 +1,16 @@
 # GitHub Follow Bot Chrome Extension
 
-Auto-follow GitHub users from North America and Europe.
+Auto-follow GitHub users based on customizable region selection.
 
 ## Features
+- Configurable region filtering (North America, South America, Europe, Asia, Africa, Oceania)
+- Default: North America and Europe enabled
+- Uncheck all regions to follow all users regardless of location
 - Reads location directly from GitHub page UI
-- Follows users from US, Canada, Mexico, and Europe
-- 5-8 follows per minute with random delays (7-12 seconds)
+- Configurable limits (max processed, max followed)
+- Adjustable follow delay (default 8-16 seconds)
 - Start/Stop controls
-- Tracks followed, skipped, and processed users
+- Tracks followed, already followed, processed users, and pages
 - No API token needed - uses your logged-in session
 - Automatically goes to next page when current page is done
 
@@ -19,7 +22,14 @@ Auto-follow GitHub users from North America and Europe.
    - Click "Load unpacked"
    - Select this folder
 
-2. Use the extension:
+2. Configure settings:
+   - Click the extension icon
+   - Set your limits (Max Processed: 10,000, Max Followed: 500)
+   - Set follow delay (Min: 8s, Max: 16s)
+   - Select regions to follow (default: North America and Europe)
+   - Click "Save Settings"
+
+3. Use the extension:
    - Log into GitHub in your browser
    - Navigate to any GitHub page with users (followers, following, search results)
    - Click the extension icon
@@ -28,13 +38,15 @@ Auto-follow GitHub users from North America and Europe.
 
 ## How it works
 - Reads user location directly from the page UI
-- Checks if location matches North America (US, Canada, Mexico) or Europe
-- Includes states, provinces, and major cities
-- Clicks Follow button if location matches
-- Random delays between 7-12 seconds after each follow (5-8 per minute)
-- Skips users instantly if location doesn't match
-- Automatically navigates to next page when done
-- Displays stats in popup (Followed, Skipped, Processed)
+- Checks if location matches your selected regions
+- Includes countries, states/provinces, and major cities for each region
+- Clicks Follow button if location matches enabled regions
+- Random delays between configured min/max seconds after each follow
+- Skips users already being followed (counts as "Already Followed")
+- Users with non-matching locations are not counted as skipped
+- Automatically navigates to next page when done (max 50 users per page)
+- Displays stats in popup (Followed, Already Followed, Processed, Pages)
+- Stops automatically when limits are reached
 
 ## Note
 Make sure you're logged into GitHub before starting the bot.
