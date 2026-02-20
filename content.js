@@ -6,31 +6,53 @@ let pageCount = 0;
 let processing = false;
 let processedUsersOnPage = new Set();
 
-const MAX_PROCESSED = 100000;
-const MAX_FOLLOWED = 800;
+// Settings with defaults
+let MAX_PROCESSED = 10000;
+let MAX_FOLLOWED = 500;
+let DELAY_MIN = 8;
+let DELAY_MAX = 16;
 
-// ALLOWED_REGIONS is loaded from regions.js
+// ALLOWED_REGIONS and EXCLUDED_COUNTRIES are loaded from regions.js
+
+// Load settings from storage
+chrome.storage.local.get(['maxProcessed', 'maxFollowed', 'delayMin', 'delayMax'], (data) => {
+  MAX_PROCESSED = data.maxProcessed || 10000;
+  MAX_FOLLOWED = data.maxFollowed || 500;
+  DELAY_MIN = data.delayMin || 8;
+  DELAY_MAX = data.delayMax || 16;
+  console.log(`Settings loaded - Max Processed: ${MAX_PROCESSED}, Max Followed: ${MAX_FOLLOWED}, Delay: ${DELAY_MIN}-${DELAY_MAX}s`);
+});
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === 'start') {
-    isRunning = true;
-    followCount = 0;
-    skipCount = 0;
-    processedCount = 0;
-    pageCount = 1;
-    processedUsersOnPage.clear();
-    
-    chrome.storage.local.set({ 
-      isRunning: true,
-      followCount: 0,
-      skipCount: 0,
-      processedCount: 0,
-      pageCount: 1
+    // Reload settings before starting
+    chrome.storage.local.get(['maxProcessed', 'maxFollowed', 'delayMin', 'delayMax'], (data) => {
+      MAX_PROCESSED = data.maxProcessed || 10000;
+      MAX_FOLLOWED = data.maxFollowed || 500;
+      DELAY_MIN = data.delayMin || 8;
+      DELAY_MAX = data.delayMax || 16;
+      
+      console.log(`Bot starting with settings - Max Processed: ${MAX_PROCESSED}, Max Followed: ${MAX_FOLLOWED}, Delay: ${DELAY_MIN}-${DELAY_MAX}s`);
+      
+      isRunning = true;
+      followCount = 0;
+      skipCount = 0;
+      processedCount = 0;
+      pageCount = 1;
+      processedUsersOnPage.clear();
+      
+      chrome.storage.local.set({ 
+        isRunning: true,
+        followCount: 0,
+        skipCount: 0,
+        processedCount: 0,
+        pageCount: 1
+      });
+      
+      console.log('Bot started!');
+      startProcessing();
     });
-    
-    console.log('Bot started!');
-    startProcessing();
   } else if (message.action === 'stop') {
     isRunning = false;
     processing = false;
@@ -141,8 +163,8 @@ function processNextUser() {
       
       updateStats();
       
-      // Wait 7-12 seconds before next follow
-      const delay = Math.random() * 5000 + 7000;
+      // Wait with configured delay
+      const delay = (Math.random() * (DELAY_MAX - DELAY_MIN) + DELAY_MIN) * 1000;
       console.log(`Waiting ${Math.round(delay/1000)}s... (Followed: ${followCount}/${MAX_FOLLOWED}, Processed: ${processedCount}/${MAX_PROCESSED}, Page: ${pageCount})`);
       setTimeout(() => processNextUser(), delay);
     } else {

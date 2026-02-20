@@ -8,6 +8,27 @@
   <div class="container">
     <h2>GitHub Follow Bot</h2>
 
+    <div class="settings-section">
+      <h3>Settings</h3>
+      <div class="setting-row">
+        <label for="maxProcessed">Max Processed:</label>
+        <input type="number" id="maxProcessed" value="10000" min="1">
+      </div>
+      <div class="setting-row">
+        <label for="maxFollowed">Max Followed:</label>
+        <input type="number" id="maxFollowed" value="500" min="1">
+      </div>
+      <div class="setting-row">
+        <label for="delayMin">Delay Min (s):</label>
+        <input type="number" id="delayMin" value="8" min="1" max="60">
+      </div>
+      <div class="setting-row">
+        <label for="delayMax">Delay Max (s):</label>
+        <input type="number" id="delayMax" value="16" min="1" max="60">
+      </div>
+      <button id="saveSettings" class="btn-save">Save Settings</button>
+    </div>
+
     <div class="status-section">
       <p>Status: <span id="status">Stopped</span></p>
       <p>Followed: <span id="followCount">0</span></p>
@@ -23,7 +44,6 @@
 
     <div class="info">
       <p>Follows users from North America & Europe only</p>
-      <p>5-8 follows per minute with random delays</p>
       <p>Make sure you're logged into GitHub first</p>
     </div>
   </div>

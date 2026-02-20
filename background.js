@@ -9,7 +9,11 @@ chrome.runtime.onInstalled.addListener(() => {
     followCount: 0,
     skipCount: 0,
     processedCount: 0,
-    pageCount: 0
+    pageCount: 0,
+    maxProcessed: 10000,
+    maxFollowed: 500,
+    delayMin: 8,
+    delayMax: 16
   });
 });
 

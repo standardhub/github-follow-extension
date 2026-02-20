@@ -5,6 +5,20 @@ const processedCountEl = document.getElementById('processedCount');
 const pageCountEl = document.getElementById('pageCount');
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
+const saveSettingsBtn = document.getElementById('saveSettings');
+
+const maxProcessedInput = document.getElementById('maxProcessed');
+const maxFollowedInput = document.getElementById('maxFollowed');
+const delayMinInput = document.getElementById('delayMin');
+const delayMaxInput = document.getElementById('delayMax');
+
+// Load saved settings
+chrome.storage.local.get(['maxProcessed', 'maxFollowed', 'delayMin', 'delayMax'], (data) => {
+  maxProcessedInput.value = data.maxProcessed || 10000;
+  maxFollowedInput.value = data.maxFollowed || 500;
+  delayMinInput.value = data.delayMin || 8;
+  delayMaxInput.value = data.delayMax || 16;
+});
 
 // Load saved data
 chrome.storage.local.get(['isRunning', 'followCount', 'skipCount', 'processedCount', 'pageCount'], (data) => {
@@ -15,6 +29,28 @@ chrome.storage.local.get(['isRunning', 'followCount', 'skipCount', 'processedCou
   skipCountEl.textContent = data.skipCount || 0;
   processedCountEl.textContent = data.processedCount || 0;
   pageCountEl.textContent = data.pageCount || 0;
+});
+
+// Save settings
+saveSettingsBtn.addEventListener('click', () => {
+  const maxProcessed = parseInt(maxProcessedInput.value) || 10000;
+  const maxFollowed = parseInt(maxFollowedInput.value) || 500;
+  const delayMin = parseInt(delayMinInput.value) || 8;
+  const delayMax = parseInt(delayMaxInput.value) || 16;
+  
+  if (delayMin > delayMax) {
+    alert('Delay Min cannot be greater than Delay Max');
+    return;
+  }
+  
+  chrome.storage.local.set({ 
+    maxProcessed, 
+    maxFollowed, 
+    delayMin, 
+    delayMax 
+  }, () => {
+    alert('Settings saved!');
+  });
 });
 
 // Start button
