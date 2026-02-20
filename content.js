@@ -146,7 +146,8 @@ function processNextUser() {
     
     // If already following, skip
     if (!canFollow) {
-      console.log(`Already following: ${username}`);
+      skipCount++;
+      console.log(`Already followed: ${username}`);
       updateStats();
       setTimeout(() => processNextUser(), 100);
       return;
@@ -168,9 +169,8 @@ function processNextUser() {
       console.log(`Waiting ${Math.round(delay/1000)}s... (Followed: ${followCount}/${MAX_FOLLOWED}, Processed: ${processedCount}/${MAX_PROCESSED}, Page: ${pageCount})`);
       setTimeout(() => processNextUser(), delay);
     } else {
-      // Skip user
-      skipCount++;
-      console.log(`✗ Skipped: ${username} (${location || 'no location'})`);
+      // Location doesn't match - don't follow, don't count as skipped
+      console.log(`✗ Location not matched: ${username} (${location || 'no location'})`);
       
       updateStats();
       
@@ -183,7 +183,7 @@ function processNextUser() {
   // No more users on this page
   console.log(`=== PAGE ${pageCount} COMPLETE ===`);
   console.log(`Processed ${processedUsersOnPage.size} users on this page`);
-  console.log(`Total: Followed ${followCount}, Skipped ${skipCount}, Processed ${processedCount}`);
+  console.log(`Total: Followed ${followCount}, Already Followed ${skipCount}, Processed ${processedCount}`);
   
   // Look for Next button
   const pagination = document.querySelector('.pagination');
@@ -264,5 +264,5 @@ function stopBot() {
   processing = false;
   chrome.storage.local.set({ isRunning: false });
   console.log(`=== BOT FINISHED ===`);
-  console.log(`Final stats - Pages: ${pageCount}, Followed: ${followCount}, Skipped: ${skipCount}, Total Processed: ${processedCount}`);
+  console.log(`Final stats - Pages: ${pageCount}, Followed: ${followCount}, Already Followed: ${skipCount}, Total Processed: ${processedCount}`);
 }
