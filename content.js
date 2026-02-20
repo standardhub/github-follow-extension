@@ -234,17 +234,49 @@ function processNextUser() {
 function checkLocation(location) {
   if (!location) return false;
   
-  const locationLower = location.toLowerCase();
+  const locationLower = location.toLowerCase().trim();
   
-  // First check if location contains any EXCLUDED country
-  // This takes priority to avoid false positives (e.g., "Paris, Texas" vs "Paris, France")
-  const hasExcludedCountry = EXCLUDED_COUNTRIES.some(country => locationLower.includes(country));
+  // Helper function to check if a word exists as a whole word (not substring)
+  const containsWholeWord = (text, word) => {
+    // Create regex that matches word boundaries
+    const regex = new RegExp('\\b' + word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
+    return regex.test(text);
+  };
+  
+  // First check if location is ONLY invalid/generic (not part of a real location)
+  // Only reject if the entire location is just the invalid term
+  const trimmedLocation = locationLower.replace(/[^a-z0-9\s]/g, ' ').trim();
+  const isOnlyInvalid = INVALID_LOCATIONS.some(invalid => {
+    const cleanInvalid = invalid.replace(/[^a-z0-9\s]/g, ' ').trim();
+    return trimmedLocation === cleanInvalid || trimmedLocation.split(/\s+/).length === 1 && trimmedLocation === cleanInvalid;
+  });
+  
+  if (isOnlyInvalid) {
+    return false; // Skip if ONLY generic location
+  }
+  
+  // Then check if location contains any EXCLUDED country
+  const hasExcludedCountry = EXCLUDED_COUNTRIES.some(country => {
+    // For multi-word countries, use includes
+    if (country.includes(' ')) {
+      return locationLower.includes(country);
+    }
+    // For single words, use whole word matching
+    return containsWholeWord(locationLower, country);
+  });
   if (hasExcludedCountry) {
     return false; // Skip if from excluded country
   }
   
-  // Then check if location contains any ALLOWED region
-  const hasAllowedRegion = ALLOWED_REGIONS.some(region => locationLower.includes(region));
+  // Finally check if location contains any ALLOWED region
+  const hasAllowedRegion = ALLOWED_REGIONS.some(region => {
+    // For multi-word regions, use includes
+    if (region.includes(' ')) {
+      return locationLower.includes(region);
+    }
+    // For single words and abbreviations, use whole word matching
+    return containsWholeWord(locationLower, region);
+  });
   return hasAllowedRegion;
 }
 

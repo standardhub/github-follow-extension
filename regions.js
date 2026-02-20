@@ -209,3 +209,12 @@ const EXCLUDED_COUNTRIES = [
   'russia', 'russian', 'moscow', 'saint petersburg', 'petersburg'
 ];
 
+// Invalid/Generic locations that should be excluded
+const INVALID_LOCATIONS = [
+  'internet', 'online', 'web', 'worldwide', 'global', 'earth', 'world',
+  'remote', 'nomad', 'digital nomad', 'everywhere', 'anywhere', 'nowhere',
+  'cyberspace', 'cloud', 'virtual', 'metaverse', 'universe', 'galaxy',
+  'home', 'here', 'there', 'somewhere', 'localhost', '127.0.0.1',
+  'n/a', 'na', 'none', 'null', 'undefined', 'unknown', 'tbd', 'tba'
+];
+
