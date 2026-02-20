@@ -12,12 +12,31 @@ const maxFollowedInput = document.getElementById('maxFollowed');
 const delayMinInput = document.getElementById('delayMin');
 const delayMaxInput = document.getElementById('delayMax');
 
+const regionNorthAmerica = document.getElementById('regionNorthAmerica');
+const regionSouthAmerica = document.getElementById('regionSouthAmerica');
+const regionEurope = document.getElementById('regionEurope');
+const regionAsia = document.getElementById('regionAsia');
+const regionAfrica = document.getElementById('regionAfrica');
+const regionOceania = document.getElementById('regionOceania');
+
 // Load saved settings
-chrome.storage.local.get(['maxProcessed', 'maxFollowed', 'delayMin', 'delayMax'], (data) => {
+chrome.storage.local.get([
+  'maxProcessed', 'maxFollowed', 'delayMin', 'delayMax',
+  'regionNorthAmerica', 'regionSouthAmerica', 'regionEurope', 
+  'regionAsia', 'regionAfrica', 'regionOceania'
+], (data) => {
   maxProcessedInput.value = data.maxProcessed || 10000;
   maxFollowedInput.value = data.maxFollowed || 500;
   delayMinInput.value = data.delayMin || 8;
   delayMaxInput.value = data.delayMax || 16;
+  
+  // Default: North America and Europe checked
+  regionNorthAmerica.checked = data.regionNorthAmerica !== undefined ? data.regionNorthAmerica : true;
+  regionSouthAmerica.checked = data.regionSouthAmerica || false;
+  regionEurope.checked = data.regionEurope !== undefined ? data.regionEurope : true;
+  regionAsia.checked = data.regionAsia || false;
+  regionAfrica.checked = data.regionAfrica || false;
+  regionOceania.checked = data.regionOceania || false;
 });
 
 // Load saved data
@@ -47,7 +66,13 @@ saveSettingsBtn.addEventListener('click', () => {
     maxProcessed, 
     maxFollowed, 
     delayMin, 
-    delayMax 
+    delayMax,
+    regionNorthAmerica: regionNorthAmerica.checked,
+    regionSouthAmerica: regionSouthAmerica.checked,
+    regionEurope: regionEurope.checked,
+    regionAsia: regionAsia.checked,
+    regionAfrica: regionAfrica.checked,
+    regionOceania: regionOceania.checked
   }, () => {
     alert('Settings saved!');
   });

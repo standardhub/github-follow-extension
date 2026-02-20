@@ -11,29 +11,67 @@ let MAX_PROCESSED = 10000;
 let MAX_FOLLOWED = 500;
 let DELAY_MIN = 8;
 let DELAY_MAX = 16;
+let ENABLED_REGIONS = {
+  northAmerica: true,
+  southAmerica: false,
+  europe: true,
+  asia: false,
+  africa: false,
+  oceania: false
+};
 
 // ALLOWED_REGIONS and EXCLUDED_COUNTRIES are loaded from regions.js
 
 // Load settings from storage
-chrome.storage.local.get(['maxProcessed', 'maxFollowed', 'delayMin', 'delayMax'], (data) => {
+chrome.storage.local.get([
+  'maxProcessed', 'maxFollowed', 'delayMin', 'delayMax',
+  'regionNorthAmerica', 'regionSouthAmerica', 'regionEurope',
+  'regionAsia', 'regionAfrica', 'regionOceania'
+], (data) => {
   MAX_PROCESSED = data.maxProcessed || 10000;
   MAX_FOLLOWED = data.maxFollowed || 500;
   DELAY_MIN = data.delayMin || 8;
   DELAY_MAX = data.delayMax || 16;
+  
+  ENABLED_REGIONS = {
+    northAmerica: data.regionNorthAmerica !== undefined ? data.regionNorthAmerica : true,
+    southAmerica: data.regionSouthAmerica || false,
+    europe: data.regionEurope !== undefined ? data.regionEurope : true,
+    asia: data.regionAsia || false,
+    africa: data.regionAfrica || false,
+    oceania: data.regionOceania || false
+  };
+  
   console.log(`Settings loaded - Max Processed: ${MAX_PROCESSED}, Max Followed: ${MAX_FOLLOWED}, Delay: ${DELAY_MIN}-${DELAY_MAX}s`);
+  console.log('Enabled regions:', ENABLED_REGIONS);
 });
 
 // Listen for messages from popup
 chrome.runtime.onMessage.addListener((message) => {
   if (message.action === 'start') {
     // Reload settings before starting
-    chrome.storage.local.get(['maxProcessed', 'maxFollowed', 'delayMin', 'delayMax'], (data) => {
+    chrome.storage.local.get([
+      'maxProcessed', 'maxFollowed', 'delayMin', 'delayMax',
+      'regionNorthAmerica', 'regionSouthAmerica', 'regionEurope',
+      'regionAsia', 'regionAfrica', 'regionOceania'
+    ], (data) => {
       MAX_PROCESSED = data.maxProcessed || 10000;
       MAX_FOLLOWED = data.maxFollowed || 500;
       DELAY_MIN = data.delayMin || 8;
       DELAY_MAX = data.delayMax || 16;
       
+      // Load region settings
+      ENABLED_REGIONS = {
+        northAmerica: data.regionNorthAmerica !== undefined ? data.regionNorthAmerica : true,
+        southAmerica: data.regionSouthAmerica || false,
+        europe: data.regionEurope !== undefined ? data.regionEurope : true,
+        asia: data.regionAsia || false,
+        africa: data.regionAfrica || false,
+        oceania: data.regionOceania || false
+      };
+      
       console.log(`Bot starting with settings - Max Processed: ${MAX_PROCESSED}, Max Followed: ${MAX_FOLLOWED}, Delay: ${DELAY_MIN}-${DELAY_MAX}s`);
+      console.log('Enabled regions:', ENABLED_REGIONS);
       
       isRunning = true;
       followCount = 0;
@@ -236,6 +274,15 @@ function checkLocation(location) {
   
   const locationLower = location.toLowerCase().trim();
   
+  // Check if any regions are enabled
+  const anyRegionEnabled = Object.values(ENABLED_REGIONS).some(enabled => enabled);
+  
+  // If no regions are selected, follow everyone
+  if (!anyRegionEnabled) {
+    console.log('No regions selected - following all users');
+    return true;
+  }
+  
   // Helper function to check if a word exists as a whole word (not substring)
   const containsWholeWord = (text, word) => {
     // Create regex that matches word boundaries
@@ -244,7 +291,6 @@ function checkLocation(location) {
   };
   
   // First check if location is ONLY invalid/generic (not part of a real location)
-  // Only reject if the entire location is just the invalid term
   const trimmedLocation = locationLower.replace(/[^a-z0-9\s]/g, ' ').trim();
   const isOnlyInvalid = INVALID_LOCATIONS.some(invalid => {
     const cleanInvalid = invalid.replace(/[^a-z0-9\s]/g, ' ').trim();
@@ -255,29 +301,37 @@ function checkLocation(location) {
     return false; // Skip if ONLY generic location
   }
   
-  // Then check if location contains any EXCLUDED country
-  const hasExcludedCountry = EXCLUDED_COUNTRIES.some(country => {
-    // For multi-word countries, use includes
-    if (country.includes(' ')) {
-      return locationLower.includes(country);
-    }
-    // For single words, use whole word matching
-    return containsWholeWord(locationLower, country);
-  });
-  if (hasExcludedCountry) {
-    return false; // Skip if from excluded country
+  // Check which region this location belongs to
+  const matchesRegion = (regionList) => {
+    return regionList.some(region => {
+      if (region.includes(' ')) {
+        return locationLower.includes(region);
+      }
+      return containsWholeWord(locationLower, region);
+    });
+  };
+  
+  // Check each enabled region
+  if (ENABLED_REGIONS.northAmerica && matchesRegion(NORTH_AMERICA_REGIONS)) {
+    return true;
+  }
+  if (ENABLED_REGIONS.southAmerica && matchesRegion(SOUTH_AMERICA_REGIONS)) {
+    return true;
+  }
+  if (ENABLED_REGIONS.europe && matchesRegion(EUROPE_REGIONS)) {
+    return true;
+  }
+  if (ENABLED_REGIONS.asia && matchesRegion(ASIA_REGIONS)) {
+    return true;
+  }
+  if (ENABLED_REGIONS.africa && matchesRegion(AFRICA_REGIONS)) {
+    return true;
+  }
+  if (ENABLED_REGIONS.oceania && matchesRegion(OCEANIA_REGIONS)) {
+    return true;
   }
   
-  // Finally check if location contains any ALLOWED region
-  const hasAllowedRegion = ALLOWED_REGIONS.some(region => {
-    // For multi-word regions, use includes
-    if (region.includes(' ')) {
-      return locationLower.includes(region);
-    }
-    // For single words and abbreviations, use whole word matching
-    return containsWholeWord(locationLower, region);
-  });
-  return hasAllowedRegion;
+  return false;
 }
 
 function updateStats() {

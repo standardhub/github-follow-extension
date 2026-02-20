@@ -1,11 +1,8 @@
-// Allowed regions - North America and Europe
-const ALLOWED_REGIONS = [
-  // === NORTH AMERICA ===
-  
+// North America regions
+const NORTH_AMERICA_REGIONS = [
   // United States
   'united states', 'usa', 'us', 'america', 'american',
-  
-  // US States (full names and abbreviations)
+  // US States
   'alabama', 'al', 'alaska', 'ak', 'arizona', 'az', 'arkansas', 'ar',
   'california', 'ca', 'colorado', 'co', 'connecticut', 'ct',
   'delaware', 'de', 'florida', 'fl', 'georgia', 'ga',
@@ -20,8 +17,7 @@ const ALLOWED_REGIONS = [
   'tennessee', 'tn', 'texas', 'tx', 'utah', 'ut', 'vermont', 'vt',
   'virginia', 'va', 'washington', 'wa', 'west virginia', 'wv',
   'wisconsin', 'wi', 'wyoming', 'wy',
-  
-  // Major US Cities
+  // US Cities
   'new york city', 'nyc', 'los angeles', 'chicago', 'houston', 'phoenix',
   'philadelphia', 'san antonio', 'san diego', 'dallas', 'san jose', 'austin',
   'jacksonville', 'fort worth', 'columbus', 'charlotte', 'san francisco',
@@ -30,191 +26,136 @@ const ALLOWED_REGIONS = [
   'tampa', 'orlando', 'cleveland', 'pittsburgh', 'sacramento', 'kansas city',
   'raleigh', 'baltimore', 'milwaukee', 'salt lake city', 'silicon valley',
   'bay area', 'palo alto', 'mountain view', 'sunnyvale', 'santa clara',
-  'memphis', 'louisville', 'richmond', 'tucson', 'albuquerque', 'fresno',
-  'mesa', 'omaha', 'long beach', 'virginia beach', 'cincinnati',
-  
   // Canada
   'canada', 'canadian',
-  
-  // Canadian Provinces/Territories
   'ontario', 'on', 'quebec', 'qc', 'british columbia', 'bc', 'alberta', 'ab',
   'manitoba', 'mb', 'saskatchewan', 'sk', 'nova scotia', 'ns',
   'new brunswick', 'nb', 'newfoundland', 'nf', 'prince edward island', 'pei',
-  'northwest territories', 'nt', 'yukon', 'yt', 'nunavut', 'nu',
-  
-  // Major Canadian Cities
   'toronto', 'montreal', 'vancouver', 'calgary', 'edmonton', 'ottawa',
-  'winnipeg', 'quebec city', 'hamilton', 'kitchener', 'london', 'victoria',
-  'halifax', 'oshawa', 'windsor', 'saskatoon', 'regina', 'waterloo',
-  'st. catharines', 'barrie', 'kelowna', 'abbotsford', 'kingston',
-  'trois-rivières', 'sherbrooke', 'moncton', 'thunder bay',
-  
+  'winnipeg', 'quebec city', 'hamilton', 'kitchener', 'halifax',
   // Mexico
   'mexico', 'mexican', 'méxico',
-  
-  // Mexican States
-  'aguascalientes', 'baja california', 'baja california sur', 'campeche',
-  'chiapas', 'chihuahua', 'coahuila', 'colima', 'durango', 'guanajuato',
-  'guerrero', 'hidalgo', 'jalisco', 'michoacán', 'michoacan', 'morelos',
-  'nayarit', 'nuevo león', 'nuevo leon', 'oaxaca', 'puebla', 'querétaro',
-  'queretaro', 'quintana roo', 'san luis potosí', 'san luis potosi',
-  'sinaloa', 'sonora', 'tabasco', 'tamaulipas', 'tlaxcala', 'veracruz',
-  'yucatán', 'yucatan', 'zacatecas', 'ciudad de méxico', 'estado de méxico',
-  
-  // Major Mexican Cities
-  'mexico city', 'cdmx', 'guadalajara', 'monterrey', 'puebla', 'tijuana',
-  'león', 'leon', 'juárez', 'juarez', 'zapopan', 'mérida', 'merida',
-  'san luis potosí', 'aguascalientes', 'hermosillo', 'saltillo', 'mexicali',
-  'culiacán', 'culiacan', 'cancún', 'cancun', 'querétaro', 'queretaro',
-  'toluca', 'morelia', 'chihuahua', 'tampico', 'veracruz', 'acapulco',
-  'mazatlán', 'mazatlan', 'tuxtla gutiérrez', 'playa del carmen',
-  
-  // === EUROPE ===
-  
+  'aguascalientes', 'baja california', 'chihuahua', 'jalisco', 'nuevo león',
+  'mexico city', 'cdmx', 'guadalajara', 'monterrey', 'tijuana', 'cancún'
+];
+
+// South America regions
+const SOUTH_AMERICA_REGIONS = [
+  'brazil', 'brazilian', 'brasil', 'são paulo', 'rio de janeiro',
+  'argentina', 'argentinian', 'buenos aires', 'córdoba',
+  'colombia', 'colombian', 'bogotá', 'medellín',
+  'peru', 'peruvian', 'lima', 'cusco',
+  'venezuela', 'venezuelan', 'caracas',
+  'chile', 'chilean', 'santiago',
+  'ecuador', 'ecuadorian', 'quito', 'guayaquil',
+  'bolivia', 'bolivian', 'la paz',
+  'paraguay', 'paraguayan', 'asunción',
+  'uruguay', 'uruguayan', 'montevideo',
+  'guyana', 'suriname', 'french guiana'
+];
+
+// Europe regions
+const EUROPE_REGIONS = [
   // Western Europe
   'uk', 'united kingdom', 'great britain', 'britain', 'british',
   'england', 'scotland', 'wales', 'northern ireland',
-  'ireland', 'irish', 'republic of ireland',
-  'france', 'french', 'germany', 'german', 'deutschland',
-  'netherlands', 'dutch', 'holland', 'belgium', 'belgian',
-  'switzerland', 'swiss', 'austria', 'austrian', 'österreich',
-  'luxembourg', 'luxembourgish',
-  
+  'london', 'manchester', 'birmingham', 'liverpool', 'edinburgh', 'glasgow', 'belfast',
+  'ireland', 'irish', 'dublin', 'cork',
+  'france', 'french', 'paris', 'marseille', 'lyon',
+  'germany', 'german', 'deutschland', 'berlin', 'munich', 'hamburg', 'frankfurt',
+  'netherlands', 'dutch', 'holland', 'amsterdam', 'rotterdam',
+  'belgium', 'belgian', 'brussels', 'antwerp',
+  'switzerland', 'swiss', 'zurich', 'geneva',
+  'austria', 'austrian', 'vienna',
+  'luxembourg',
   // Southern Europe
-  'spain', 'spanish', 'españa', 'portugal', 'portuguese',
-  'italy', 'italian', 'italia', 'greece', 'greek', 'hellas',
-  'malta', 'maltese', 'cyprus', 'cypriot',
-  'andorra', 'monaco', 'san marino', 'vatican',
-  
+  'spain', 'spanish', 'españa', 'madrid', 'barcelona', 'valencia',
+  'portugal', 'portuguese', 'lisbon', 'porto',
+  'italy', 'italian', 'italia', 'rome', 'milan', 'naples', 'florence',
+  'greece', 'greek', 'athens', 'thessaloniki',
+  'malta', 'cyprus', 'andorra', 'monaco', 'san marino', 'vatican',
   // Northern Europe
-  'sweden', 'swedish', 'sverige', 'norway', 'norwegian', 'norge',
-  'denmark', 'danish', 'danmark', 'finland', 'finnish', 'suomi',
-  'iceland', 'icelandic', 'ísland',
-  
+  'sweden', 'swedish', 'stockholm', 'gothenburg',
+  'norway', 'norwegian', 'oslo', 'bergen',
+  'denmark', 'danish', 'copenhagen',
+  'finland', 'finnish', 'helsinki',
+  'iceland', 'icelandic', 'reykjavik',
   // Eastern Europe
-  'poland', 'polish', 'polska', 'czech republic', 'czech', 'czechia',
-  'slovakia', 'slovak', 'hungary', 'hungarian', 'magyarország',
-  'romania', 'romanian', 'românia', 'bulgaria', 'bulgarian',
-  'croatia', 'croatian', 'hrvatska', 'slovenia', 'slovenian',
-  'serbia', 'serbian', 'bosnia', 'herzegovina', 'montenegro',
-  'albania', 'albanian', 'kosovo', 'north macedonia', 'macedonia',
-  
-  // Baltic States
-  'estonia', 'estonian', 'eesti', 'latvia', 'latvian',
-  'lithuania', 'lithuanian', 'lietuva',
-  
-  // Major UK Cities
-  'london', 'manchester', 'birmingham', 'liverpool', 'leeds', 'glasgow',
-  'edinburgh', 'bristol', 'cardiff', 'belfast', 'sheffield', 'newcastle',
-  'nottingham', 'leicester', 'southampton', 'brighton', 'aberdeen',
-  'cambridge', 'oxford', 'york', 'bath', 'exeter', 'plymouth',
-  
-  // Major Irish Cities
-  'dublin', 'cork', 'galway', 'limerick', 'waterford', 'drogheda',
-  
-  // Major German Cities
-  'berlin', 'munich', 'münchen', 'hamburg', 'frankfurt', 'cologne', 'köln',
-  'stuttgart', 'düsseldorf', 'dusseldorf', 'dortmund', 'essen', 'leipzig',
-  'bremen', 'dresden', 'hannover', 'nuremberg', 'nürnberg', 'duisburg',
-  
-  // Major French Cities
-  'paris', 'marseille', 'lyon', 'toulouse', 'nice', 'nantes', 'strasbourg',
-  'montpellier', 'bordeaux', 'lille', 'rennes', 'reims', 'toulon',
-  
-  // Major Italian Cities
-  'rome', 'roma', 'milan', 'milano', 'naples', 'napoli', 'turin', 'torino',
-  'palermo', 'genoa', 'genova', 'bologna', 'florence', 'firenze',
-  'bari', 'catania', 'venice', 'venezia', 'verona', 'messina',
-  
-  // Major Spanish Cities
-  'madrid', 'barcelona', 'valencia', 'seville', 'sevilla', 'zaragoza',
-  'málaga', 'malaga', 'murcia', 'palma', 'las palmas', 'bilbao',
-  'alicante', 'córdoba', 'cordoba', 'valladolid', 'vigo', 'gijón',
-  
-  // Major Portuguese Cities
-  'lisbon', 'lisboa', 'porto', 'braga', 'coimbra', 'funchal', 'amadora',
-  
-  // Major Dutch Cities
-  'amsterdam', 'rotterdam', 'the hague', 'den haag', 'utrecht', 'eindhoven',
-  'tilburg', 'groningen', 'almere', 'breda', 'nijmegen', 'haarlem',
-  
-  // Major Belgian Cities
-  'brussels', 'bruxelles', 'antwerp', 'antwerpen', 'ghent', 'gent',
-  'charleroi', 'liège', 'liege', 'bruges', 'brugge', 'namur', 'leuven',
-  
-  // Major Swiss Cities
-  'zurich', 'zürich', 'geneva', 'genève', 'basel', 'bern', 'lausanne',
-  'lucerne', 'luzern', 'lugano', 'biel', 'thun', 'winterthur',
-  
-  // Major Austrian Cities
-  'vienna', 'wien', 'graz', 'linz', 'salzburg', 'innsbruck', 'klagenfurt',
-  
-  // Major Nordic Cities
-  'stockholm', 'gothenburg', 'göteborg', 'malmö', 'malmo', 'uppsala',
-  'oslo', 'bergen', 'trondheim', 'stavanger',
-  'copenhagen', 'københavn', 'aarhus', 'odense', 'aalborg',
-  'helsinki', 'espoo', 'tampere', 'vantaa', 'turku', 'oulu',
-  'reykjavik', 'reykjavík',
-  
-  // Major Eastern European Cities
-  'warsaw', 'warszawa', 'kraków', 'krakow', 'łódź', 'lodz', 'wrocław',
-  'prague', 'praha', 'brno', 'ostrava',
-  'budapest', 'debrecen', 'szeged', 'miskolc',
-  'bucharest', 'bucurești', 'cluj-napoca', 'timișoara', 'timisoara',
-  'sofia', 'plovdiv', 'varna', 'burgas',
-  'zagreb', 'split', 'rijeka',
-  'athens', 'athina', 'thessaloniki', 'patras', 'heraklion'
+  'poland', 'polish', 'warsaw', 'kraków',
+  'czech republic', 'czech', 'czechia', 'prague',
+  'slovakia', 'slovak', 'bratislava',
+  'hungary', 'hungarian', 'budapest',
+  'romania', 'romanian', 'bucharest',
+  'bulgaria', 'bulgarian', 'sofia',
+  'croatia', 'croatian', 'zagreb',
+  'slovenia', 'slovenian', 'ljubljana',
+  'serbia', 'serbian', 'belgrade',
+  'bosnia', 'herzegovina', 'montenegro', 'albania', 'kosovo', 'macedonia',
+  'estonia', 'estonian', 'tallinn',
+  'latvia', 'latvian', 'riga',
+  'lithuania', 'lithuanian', 'vilnius'
 ];
 
-// Excluded regions - Countries NOT in North America or Europe
-const EXCLUDED_COUNTRIES = [
-  // Asia
-  'china', 'chinese', 'japan', 'japanese', 'korea', 'korean', 'south korea', 'north korea',
-  'india', 'indian', 'pakistan', 'pakistani', 'bangladesh', 'bengali',
-  'indonesia', 'indonesian', 'philippines', 'filipino', 'vietnam', 'vietnamese',
-  'thailand', 'thai', 'myanmar', 'burma', 'singapore', 'singaporean',
-  'malaysia', 'malaysian', 'taiwan', 'taiwanese', 'hong kong', 'macau',
-  'nepal', 'nepalese', 'sri lanka', 'cambodia', 'laos', 'mongolia',
-  'afghanistan', 'iran', 'iranian', 'iraq', 'iraqi', 'saudi arabia', 'saudi',
-  'israel', 'israeli', 'palestine', 'palestinian', 'jordan', 'lebanon',
-  'syria', 'yemen', 'uae', 'dubai', 'qatar', 'kuwait', 'bahrain', 'oman',
-  'turkey', 'turkish', 'uzbekistan', 'kazakhstan', 'azerbaijan', 'armenia',
-  
-  // Africa
-  'nigeria', 'nigerian', 'egypt', 'egyptian', 'ethiopia', 'ethiopian',
-  'south africa', 'kenya', 'kenyan', 'tanzania', 'uganda', 'algeria',
-  'morocco', 'moroccan', 'ghana', 'ghanaian', 'mozambique', 'madagascar',
-  'cameroon', 'ivory coast', 'niger', 'burkina faso', 'mali', 'malawi',
-  'zambia', 'senegal', 'somalia', 'chad', 'zimbabwe', 'guinea', 'rwanda',
+// Asia regions
+const ASIA_REGIONS = [
+  'china', 'chinese', 'beijing', 'shanghai', 'hong kong', 'macau',
+  'japan', 'japanese', 'tokyo', 'osaka', 'kyoto',
+  'korea', 'korean', 'south korea', 'seoul', 'busan',
+  'india', 'indian', 'delhi', 'mumbai', 'bangalore', 'chennai',
+  'pakistan', 'pakistani', 'karachi', 'lahore',
+  'bangladesh', 'bengali', 'dhaka',
+  'indonesia', 'indonesian', 'jakarta', 'bali',
+  'philippines', 'filipino', 'manila',
+  'vietnam', 'vietnamese', 'hanoi', 'ho chi minh',
+  'thailand', 'thai', 'bangkok',
+  'singapore', 'singaporean',
+  'malaysia', 'malaysian', 'kuala lumpur',
+  'taiwan', 'taiwanese', 'taipei',
+  'myanmar', 'burma', 'cambodia', 'laos', 'mongolia',
+  'nepal', 'nepalese', 'kathmandu',
+  'sri lanka', 'colombo',
+  'afghanistan', 'iran', 'iranian', 'tehran',
+  'iraq', 'iraqi', 'baghdad',
+  'saudi arabia', 'saudi', 'riyadh',
+  'israel', 'israeli', 'tel aviv', 'jerusalem',
+  'palestine', 'palestinian',
+  'jordan', 'lebanon', 'syria', 'yemen',
+  'uae', 'dubai', 'abu dhabi', 'qatar', 'kuwait', 'bahrain', 'oman',
+  'turkey', 'turkish', 'istanbul', 'ankara',
+  'uzbekistan', 'kazakhstan', 'azerbaijan', 'armenia'
+];
+
+// Africa regions
+const AFRICA_REGIONS = [
+  'nigeria', 'nigerian', 'lagos',
+  'egypt', 'egyptian', 'cairo',
+  'ethiopia', 'ethiopian', 'addis ababa',
+  'south africa', 'cape town', 'johannesburg',
+  'kenya', 'kenyan', 'nairobi',
+  'tanzania', 'dar es salaam',
+  'uganda', 'kampala',
+  'algeria', 'algiers',
+  'morocco', 'moroccan', 'casablanca',
+  'ghana', 'ghanaian', 'accra',
+  'mozambique', 'madagascar', 'cameroon', 'ivory coast',
+  'niger', 'burkina faso', 'mali', 'malawi', 'zambia',
+  'senegal', 'somalia', 'chad', 'zimbabwe', 'guinea', 'rwanda',
   'benin', 'tunisia', 'tunisian', 'libya', 'libyan', 'sudan', 'angola',
-  'togo', 'sierra leone', 'congo', 'liberia', 'mauritania', 'eritrea',
-  
-  // South America
-  'brazil', 'brazilian', 'argentina', 'argentinian', 'colombia', 'colombian',
-  'peru', 'peruvian', 'venezuela', 'venezuelan', 'chile', 'chilean',
-  'ecuador', 'ecuadorian', 'bolivia', 'bolivian', 'paraguay', 'uruguayan',
-  'uruguay', 'guyana', 'suriname', 'french guiana',
-  
-  // Central America & Caribbean (excluding Mexico)
-  'guatemala', 'honduran', 'honduras', 'el salvador', 'nicaragua',
-  'costa rica', 'panama', 'belize', 'cuba', 'cuban', 'jamaica', 'jamaican',
-  'haiti', 'haitian', 'dominican republic', 'puerto rico', 'trinidad',
-  'bahamas', 'barbados', 'grenada',
-  
-  // Oceania
-  'australia', 'australian', 'new zealand', 'fiji', 'papua new guinea',
-  'samoa', 'tonga', 'vanuatu', 'solomon islands',
-  
-  // Russia (transcontinental but mostly Asian)
-  'russia', 'russian', 'moscow', 'saint petersburg', 'petersburg'
+  'togo', 'sierra leone', 'congo', 'liberia', 'mauritania', 'eritrea'
 ];
 
-// Invalid/Generic locations that should be excluded
+// Oceania regions
+const OCEANIA_REGIONS = [
+  'australia', 'australian', 'sydney', 'melbourne', 'brisbane', 'perth',
+  'new zealand', 'auckland', 'wellington',
+  'fiji', 'papua new guinea', 'samoa', 'tonga', 'vanuatu', 'solomon islands'
+];
+
+// Invalid/Generic locations
 const INVALID_LOCATIONS = [
   'internet', 'online', 'web', 'worldwide', 'global', 'earth', 'world',
   'remote', 'nomad', 'digital nomad', 'everywhere', 'anywhere', 'nowhere',
   'cyberspace', 'cloud', 'virtual', 'metaverse', 'universe', 'galaxy',
-  'home', 'here', 'there', 'somewhere', 'localhost', '127.0.0.1',
+  'home', 'here', 'there', 'somewhere', 'localhost',
   'n/a', 'na', 'none', 'null', 'undefined', 'unknown', 'tbd', 'tba'
 ];
-

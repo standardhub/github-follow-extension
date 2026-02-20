@@ -66,6 +66,23 @@ h3 {
   background: #0860ca;
 }
 
+.checkbox-row {
+  margin-bottom: 6px;
+}
+
+.checkbox-row label {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  color: #24292e;
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
 .status-section {
   background: #f6f8fa;
   padding: 12px;
