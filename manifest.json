@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub Follow Bot",
+  "version": "1.0",
+  "description": "Auto-follow GitHub users from US, Canada, and Europe",
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["https://github.com/*"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [{
+    "matches": ["https://github.com/*"],
+    "js": ["regions.js", "content.js"],
+    "run_at": "document_idle"
+  }],
+  "background": {
+    "service_worker": "background.js"
+  }
+}
