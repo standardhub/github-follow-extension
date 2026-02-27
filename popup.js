@@ -18,12 +18,14 @@ const regionEurope = document.getElementById('regionEurope');
 const regionAsia = document.getElementById('regionAsia');
 const regionAfrica = document.getElementById('regionAfrica');
 const regionOceania = document.getElementById('regionOceania');
+const saveResultsCheckbox = document.getElementById('saveResults');
+const downloadBtn = document.getElementById('downloadBtn');
 
 // Load saved settings
 chrome.storage.local.get([
   'maxProcessed', 'maxFollowed', 'delayMin', 'delayMax',
   'regionNorthAmerica', 'regionSouthAmerica', 'regionEurope', 
-  'regionAsia', 'regionAfrica', 'regionOceania'
+  'regionAsia', 'regionAfrica', 'regionOceania', 'saveResults'
 ], (data) => {
   maxProcessedInput.value = data.maxProcessed || 10000;
   maxFollowedInput.value = data.maxFollowed || 500;
@@ -37,6 +39,7 @@ chrome.storage.local.get([
   regionAsia.checked = data.regionAsia || false;
   regionAfrica.checked = data.regionAfrica || false;
   regionOceania.checked = data.regionOceania || false;
+  saveResultsCheckbox.checked = data.saveResults || false;
 });
 
 // Load saved data
@@ -72,7 +75,8 @@ saveSettingsBtn.addEventListener('click', () => {
     regionEurope: regionEurope.checked,
     regionAsia: regionAsia.checked,
     regionAfrica: regionAfrica.checked,
-    regionOceania: regionOceania.checked
+    regionOceania: regionOceania.checked,
+    saveResults: saveResultsCheckbox.checked
   }, () => {
     alert('Settings saved!');
   });
@@ -86,7 +90,8 @@ startBtn.addEventListener('click', async () => {
     followCount: 0, 
     skipCount: 0,
     processedCount: 0,
-    pageCount: 0
+    pageCount: 0,
+    followedUsers: {}
   }, () => {
     followCountEl.textContent = 0;
     skipCountEl.textContent = 0;
@@ -126,6 +131,39 @@ function updateUIStopped() {
   startBtn.disabled = false;
   stopBtn.disabled = true;
 }
+
+// Download results button
+downloadBtn.addEventListener('click', () => {
+  chrome.storage.local.get(['followedUsers'], (data) => {
+    const followedUsers = data.followedUsers || {};
+    
+    if (Object.keys(followedUsers).length === 0) {
+      alert('No followed users to download');
+      return;
+    }
+    
+    // Build the text content
+    let content = '';
+    const sortedCountries = Object.keys(followedUsers).sort();
+    
+    for (const country of sortedCountries) {
+      content += `=== ${country} ===\n`;
+      followedUsers[country].forEach(username => {
+        content += `${username}\n`;
+      });
+      content += '\n';
+    }
+    
+    // Create download
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'followed.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+});
 
 // Listen for updates from content script
 chrome.runtime.onMessage.addListener((message) => {

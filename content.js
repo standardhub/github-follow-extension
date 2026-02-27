@@ -11,6 +11,7 @@ let MAX_PROCESSED = 10000;
 let MAX_FOLLOWED = 500;
 let DELAY_MIN = 8;
 let DELAY_MAX = 16;
+let SAVE_RESULTS = false;
 let ENABLED_REGIONS = {
   northAmerica: true,
   southAmerica: false,
@@ -19,6 +20,7 @@ let ENABLED_REGIONS = {
   africa: false,
   oceania: false
 };
+let followedUsers = {};
 
 // ALLOWED_REGIONS and EXCLUDED_COUNTRIES are loaded from regions.js
 
@@ -26,12 +28,14 @@ let ENABLED_REGIONS = {
 chrome.storage.local.get([
   'maxProcessed', 'maxFollowed', 'delayMin', 'delayMax',
   'regionNorthAmerica', 'regionSouthAmerica', 'regionEurope',
-  'regionAsia', 'regionAfrica', 'regionOceania'
+  'regionAsia', 'regionAfrica', 'regionOceania', 'saveResults', 'followedUsers'
 ], (data) => {
   MAX_PROCESSED = data.maxProcessed || 10000;
   MAX_FOLLOWED = data.maxFollowed || 500;
   DELAY_MIN = data.delayMin || 8;
   DELAY_MAX = data.delayMax || 16;
+  SAVE_RESULTS = data.saveResults || false;
+  followedUsers = data.followedUsers || {};
   
   ENABLED_REGIONS = {
     northAmerica: data.regionNorthAmerica !== undefined ? data.regionNorthAmerica : true,
@@ -43,6 +47,7 @@ chrome.storage.local.get([
   };
   
   console.log(`Settings loaded - Max Processed: ${MAX_PROCESSED}, Max Followed: ${MAX_FOLLOWED}, Delay: ${DELAY_MIN}-${DELAY_MAX}s`);
+  console.log('Save Results:', SAVE_RESULTS);
   console.log('Enabled regions:', ENABLED_REGIONS);
 });
 
@@ -53,12 +58,13 @@ chrome.runtime.onMessage.addListener((message) => {
     chrome.storage.local.get([
       'maxProcessed', 'maxFollowed', 'delayMin', 'delayMax',
       'regionNorthAmerica', 'regionSouthAmerica', 'regionEurope',
-      'regionAsia', 'regionAfrica', 'regionOceania'
+      'regionAsia', 'regionAfrica', 'regionOceania', 'saveResults'
     ], (data) => {
       MAX_PROCESSED = data.maxProcessed || 10000;
       MAX_FOLLOWED = data.maxFollowed || 500;
       DELAY_MIN = data.delayMin || 8;
       DELAY_MAX = data.delayMax || 16;
+      SAVE_RESULTS = data.saveResults || false;
       
       // Load region settings
       ENABLED_REGIONS = {
@@ -71,6 +77,7 @@ chrome.runtime.onMessage.addListener((message) => {
       };
       
       console.log(`Bot starting with settings - Max Processed: ${MAX_PROCESSED}, Max Followed: ${MAX_FOLLOWED}, Delay: ${DELAY_MIN}-${DELAY_MAX}s`);
+      console.log('Save Results:', SAVE_RESULTS);
       console.log('Enabled regions:', ENABLED_REGIONS);
       
       isRunning = true;
@@ -79,13 +86,15 @@ chrome.runtime.onMessage.addListener((message) => {
       processedCount = 0;
       pageCount = 1;
       processedUsersOnPage.clear();
+      followedUsers = {}; // Reset followed users on start
       
       chrome.storage.local.set({ 
         isRunning: true,
         followCount: 0,
         skipCount: 0,
         processedCount: 0,
-        pageCount: 1
+        pageCount: 1,
+        followedUsers: {}
       });
       
       console.log('Bot started!');
@@ -102,7 +111,7 @@ chrome.runtime.onMessage.addListener((message) => {
 // Check if bot should resume after page load
 window.addEventListener('load', () => {
   setTimeout(() => {
-    chrome.storage.local.get(['isRunning', 'followCount', 'skipCount', 'processedCount', 'pageCount'], (data) => {
+    chrome.storage.local.get(['isRunning', 'followCount', 'skipCount', 'processedCount', 'pageCount', 'followedUsers', 'saveResults'], (data) => {
       if (data.isRunning && !isRunning) {
         console.log('=== RESUMING BOT AFTER PAGE NAVIGATION ===');
         isRunning = true;
@@ -110,6 +119,8 @@ window.addEventListener('load', () => {
         skipCount = data.skipCount || 0;
         processedCount = data.processedCount || 0;
         pageCount = data.pageCount || 1;
+        followedUsers = data.followedUsers || {};
+        SAVE_RESULTS = data.saveResults || false;
         processedUsersOnPage.clear();
         
         console.log(`Resumed - Page: ${pageCount}, Followed: ${followCount}, Skipped: ${skipCount}, Processed: ${processedCount}`);
@@ -200,6 +211,15 @@ function processNextUser() {
       followCount++;
       console.log(`✓ Followed: ${username} (${location || 'no location'})`);
       
+      // Save to results if enabled
+      if (SAVE_RESULTS) {
+        const country = extractCountry(location);
+        if (!followedUsers[country]) {
+          followedUsers[country] = [];
+        }
+        followedUsers[country].push(username);
+      }
+      
       updateStats();
       
       // Wait with configured delay
@@ -262,11 +282,174 @@ function processNextUser() {
     followCount,
     skipCount,
     processedCount,
-    pageCount
+    pageCount,
+    followedUsers
   }, () => {
     console.log('State saved, navigating now...');
     window.location.href = nextLink.href;
   });
+}
+
+function extractCountry(location) {
+  if (!location) return 'Unknown';
+  
+  const locationLower = location.toLowerCase().trim();
+  
+  // Check each region and return the country name
+  // North America
+  if (locationLower.includes('usa') || locationLower.includes('united states') || locationLower.includes('america')) {
+    return 'United States';
+  }
+  
+  // Check US states
+  const usStates = ['alabama', 'alaska', 'arizona', 'arkansas', 'california', 'colorado', 'connecticut', 
+    'delaware', 'florida', 'georgia', 'hawaii', 'idaho', 'illinois', 'indiana', 'iowa', 'kansas', 
+    'kentucky', 'louisiana', 'maine', 'maryland', 'massachusetts', 'michigan', 'minnesota', 'mississippi', 
+    'missouri', 'montana', 'nebraska', 'nevada', 'new hampshire', 'new jersey', 'new mexico', 'new york', 
+    'north carolina', 'north dakota', 'ohio', 'oklahoma', 'oregon', 'pennsylvania', 'rhode island', 
+    'south carolina', 'south dakota', 'tennessee', 'texas', 'utah', 'vermont', 'virginia', 'washington', 
+    'west virginia', 'wisconsin', 'wyoming'];
+  
+  const usStateAbbr = [' al', ' ak', ' az', ' ar', ' ca', ' co', ' ct', ' de', ' fl', ' ga', ' hi', ' id', 
+    ' il', ' in', ' ia', ' ks', ' ky', ' la', ' me', ' md', ' ma', ' mi', ' mn', ' ms', ' mo', ' mt', 
+    ' ne', ' nv', ' nh', ' nj', ' nm', ' ny', ' nc', ' nd', ' oh', ' ok', ' or', ' pa', ' ri', ' sc', 
+    ' sd', ' tn', ' tx', ' ut', ' vt', ' va', ' wa', ' wv', ' wi', ' wy'];
+  
+  const usCities = ['new york', 'los angeles', 'chicago', 'houston', 'phoenix', 'philadelphia', 'san antonio', 
+    'san diego', 'dallas', 'san jose', 'austin', 'jacksonville', 'fort worth', 'columbus', 'charlotte', 
+    'san francisco', 'indianapolis', 'seattle', 'denver', 'boston', 'nashville', 'detroit', 'portland', 
+    'las vegas', 'miami', 'atlanta', 'oakland', 'minneapolis', 'tampa', 'orlando', 'cleveland', 'pittsburgh', 
+    'sacramento', 'kansas city', 'raleigh', 'baltimore', 'milwaukee', 'salt lake city', 'silicon valley', 
+    'bay area', 'palo alto', 'mountain view', 'sunnyvale', 'santa clara'];
+  
+  for (const state of usStates) {
+    if (locationLower.includes(state)) return 'United States';
+  }
+  for (const abbr of usStateAbbr) {
+    if (locationLower.includes(abbr)) return 'United States';
+  }
+  for (const city of usCities) {
+    if (locationLower.includes(city)) return 'United States';
+  }
+  
+  // Canada
+  if (locationLower.includes('canada') || locationLower.includes('canadian') || 
+      locationLower.includes('toronto') || locationLower.includes('montreal') || 
+      locationLower.includes('vancouver') || locationLower.includes('calgary') || 
+      locationLower.includes('ottawa') || locationLower.includes('ontario') || 
+      locationLower.includes('quebec') || locationLower.includes('british columbia') || 
+      locationLower.includes('alberta')) {
+    return 'Canada';
+  }
+  
+  // Mexico
+  if (locationLower.includes('mexico') || locationLower.includes('méxico')) {
+    return 'Mexico';
+  }
+  
+  // UK
+  if (locationLower.includes('uk') || locationLower.includes('united kingdom') || 
+      locationLower.includes('england') || locationLower.includes('scotland') || 
+      locationLower.includes('wales') || locationLower.includes('northern ireland') || 
+      locationLower.includes('london') || locationLower.includes('manchester') || 
+      locationLower.includes('birmingham') || locationLower.includes('liverpool') || 
+      locationLower.includes('edinburgh') || locationLower.includes('glasgow') || 
+      locationLower.includes('cardiff') || locationLower.includes('belfast') ||
+      locationLower.includes('ipswich') || locationLower.includes('britain') || 
+      locationLower.includes('british')) {
+    return 'United Kingdom';
+  }
+  
+  // Ireland
+  if (locationLower.includes('ireland') || locationLower.includes('dublin') || locationLower.includes('irish')) {
+    return 'Ireland';
+  }
+  
+  // France
+  if (locationLower.includes('france') || locationLower.includes('french') || 
+      locationLower.includes('paris') || locationLower.includes('marseille') || locationLower.includes('lyon')) {
+    return 'France';
+  }
+  
+  // Germany
+  if (locationLower.includes('germany') || locationLower.includes('german') || 
+      locationLower.includes('deutschland') || locationLower.includes('berlin') || 
+      locationLower.includes('munich') || locationLower.includes('hamburg') || locationLower.includes('frankfurt')) {
+    return 'Germany';
+  }
+  
+  // Netherlands
+  if (locationLower.includes('netherlands') || locationLower.includes('dutch') || 
+      locationLower.includes('holland') || locationLower.includes('amsterdam') || locationLower.includes('rotterdam')) {
+    return 'Netherlands';
+  }
+  
+  // Spain
+  if (locationLower.includes('spain') || locationLower.includes('spanish') || 
+      locationLower.includes('españa') || locationLower.includes('madrid') || 
+      locationLower.includes('barcelona') || locationLower.includes('valencia')) {
+    return 'Spain';
+  }
+  
+  // Italy
+  if (locationLower.includes('italy') || locationLower.includes('italian') || 
+      locationLower.includes('italia') || locationLower.includes('rome') || 
+      locationLower.includes('milan') || locationLower.includes('naples') || locationLower.includes('florence')) {
+    return 'Italy';
+  }
+  
+  // Other European countries
+  if (locationLower.includes('portugal') || locationLower.includes('lisbon')) return 'Portugal';
+  if (locationLower.includes('belgium') || locationLower.includes('brussels')) return 'Belgium';
+  if (locationLower.includes('switzerland') || locationLower.includes('zurich')) return 'Switzerland';
+  if (locationLower.includes('austria') || locationLower.includes('vienna')) return 'Austria';
+  if (locationLower.includes('sweden') || locationLower.includes('stockholm')) return 'Sweden';
+  if (locationLower.includes('norway') || locationLower.includes('oslo')) return 'Norway';
+  if (locationLower.includes('denmark') || locationLower.includes('copenhagen')) return 'Denmark';
+  if (locationLower.includes('finland') || locationLower.includes('helsinki')) return 'Finland';
+  if (locationLower.includes('poland') || locationLower.includes('warsaw')) return 'Poland';
+  if (locationLower.includes('czech') || locationLower.includes('prague')) return 'Czech Republic';
+  if (locationLower.includes('greece') || locationLower.includes('athens')) return 'Greece';
+  
+  // Asia
+  if (locationLower.includes('china') || locationLower.includes('chinese') || 
+      locationLower.includes('beijing') || locationLower.includes('shanghai')) return 'China';
+  if (locationLower.includes('japan') || locationLower.includes('japanese') || 
+      locationLower.includes('tokyo') || locationLower.includes('osaka')) return 'Japan';
+  if (locationLower.includes('korea') || locationLower.includes('korean') || 
+      locationLower.includes('seoul')) return 'South Korea';
+  if (locationLower.includes('india') || locationLower.includes('indian') || 
+      locationLower.includes('delhi') || locationLower.includes('mumbai') || 
+      locationLower.includes('bangalore')) return 'India';
+  if (locationLower.includes('singapore')) return 'Singapore';
+  if (locationLower.includes('thailand') || locationLower.includes('bangkok')) return 'Thailand';
+  if (locationLower.includes('vietnam') || locationLower.includes('hanoi')) return 'Vietnam';
+  if (locationLower.includes('indonesia') || locationLower.includes('jakarta')) return 'Indonesia';
+  if (locationLower.includes('philippines') || locationLower.includes('manila')) return 'Philippines';
+  if (locationLower.includes('malaysia') || locationLower.includes('kuala lumpur')) return 'Malaysia';
+  if (locationLower.includes('taiwan') || locationLower.includes('taipei')) return 'Taiwan';
+  if (locationLower.includes('hong kong')) return 'Hong Kong';
+  
+  // South America
+  if (locationLower.includes('brazil') || locationLower.includes('brasil') || 
+      locationLower.includes('são paulo') || locationLower.includes('rio de janeiro')) return 'Brazil';
+  if (locationLower.includes('argentina') || locationLower.includes('buenos aires')) return 'Argentina';
+  if (locationLower.includes('colombia') || locationLower.includes('bogotá')) return 'Colombia';
+  if (locationLower.includes('chile') || locationLower.includes('santiago')) return 'Chile';
+  if (locationLower.includes('peru') || locationLower.includes('lima')) return 'Peru';
+  
+  // Oceania
+  if (locationLower.includes('australia') || locationLower.includes('sydney') || 
+      locationLower.includes('melbourne') || locationLower.includes('brisbane')) return 'Australia';
+  if (locationLower.includes('new zealand') || locationLower.includes('auckland')) return 'New Zealand';
+  
+  // Africa
+  if (locationLower.includes('south africa') || locationLower.includes('cape town')) return 'South Africa';
+  if (locationLower.includes('nigeria') || locationLower.includes('lagos')) return 'Nigeria';
+  if (locationLower.includes('egypt') || locationLower.includes('cairo')) return 'Egypt';
+  if (locationLower.includes('kenya') || locationLower.includes('nairobi')) return 'Kenya';
+  
+  return 'Other';
 }
 
 function checkLocation(location) {
@@ -335,7 +518,7 @@ function checkLocation(location) {
 }
 
 function updateStats() {
-  chrome.storage.local.set({ followCount, skipCount, processedCount, pageCount });
+  chrome.storage.local.set({ followCount, skipCount, processedCount, pageCount, followedUsers });
   chrome.runtime.sendMessage({ 
     action: 'updateStats', 
     followCount, 

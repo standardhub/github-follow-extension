@@ -19,7 +19,9 @@ chrome.runtime.onInstalled.addListener(() => {
     regionEurope: true,
     regionAsia: false,
     regionAfrica: false,
-    regionOceania: false
+    regionOceania: false,
+    saveResults: false,
+    followedUsers: {}
   });
 });
 
